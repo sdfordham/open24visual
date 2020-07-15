@@ -1,0 +1,32 @@
+bills_apt:
+- SKY
+- BORD GAIS
+bills_other:
+- SPOTIFY
+- PLEX
+- EIR
+- TESCO MOBILE
+- NETFLIX.COM
+- Amazon Prime
+cash:
+- ATM
+groceries:
+- DUNNES
+- SUPERVALU
+- TESCO STORES
+- CENTRA
+- LONDIS
+- ALDI
+- LIDL
+- SPAR
+- MARKS
+restaurants:
+- BOOJUM
+- MCDONALDS
+travel:
+- LEAP
+- GOBUS
+- IRISH RAIL
+vacation:
+- RYANAIR
+- AERLING
