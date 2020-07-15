@@ -79,6 +79,21 @@ class Open24Visual:
         fig = px.bar(stats, barmode='group')
         fig.show()
 
+    def plot_subcategory_totals(self, category: str):
+        # Plot subcategory totals per month for a given category using Plotly
+        if self.data is None:
+            raise ValueError('No data available')
+        if _SUBCATEGORY not in self.data.columns:
+            raise ValueError('Categorise data first')
+        if category not in self.data[_CATEGORY].unique():
+            raise ValueError('Not a valid category')
+        _data = self.data.copy()
+        _data[_MONTH] = _data.index.strftime('%Y-%m')
+        _data = _data[_data[_CATEGORY] == category]
+        stats = pd.pivot_table(_data, values=self.out, index=_MONTH, columns=_SUBCATEGORY, aggfunc=np.sum)
+        fig = px.bar(stats, barmode='group')
+        fig.show()
+
 
 if __name__ == '__main__':
     DATA_PATH = r'permanent tsb - Transaction list.xls'
@@ -88,3 +103,4 @@ if __name__ == '__main__':
     o.categorise_data(YAML_PATH)
     o.plot_balance()
     o.plot_category_totals()
+    # o.plot_subcategory_totals('groceries')
