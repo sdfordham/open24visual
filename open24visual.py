@@ -24,6 +24,8 @@ class Open24Visual:
         data = pd.read_csv(path, encoding='utf-16', sep='\t', thousands=',')
         date_col = self._get_column_name(data, 'date')
         data[date_col] = pd.to_datetime(data[date_col], format=_DATE_FORMAT)
+        desc_col = self._get_column_name(data, 'description')
+        data[desc_col] = data[desc_col].astype('string')
         data.set_index(date_col, inplace=True)
         data.sort_index(inplace=True)
         return data
@@ -44,7 +46,9 @@ class Open24Visual:
         with open(yaml_path, 'r') as Y:
             category_dict = yaml.load(Y, Loader=yaml.Loader)
         self.data[_CATEGORY] = self.data[self.description].apply(lambda x: self._categorise(x, category_dict)[0])
+        self.data[_CATEGORY] = self.data[_CATEGORY].astype('category')
         self.data[_SUBCATEGORY] = self.data[self.description].apply(lambda x: self._categorise(x, category_dict)[1])
+        self.data[_SUBCATEGORY] = self.data[_SUBCATEGORY].astype('category')
 
     @staticmethod
     def _categorise(x: str, category_dict: dict) -> tuple:
