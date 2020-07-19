@@ -102,26 +102,26 @@ def show_monthly_graphs(o24v: Open24Visual):
     for cat in o24v.data[_CATEGORY].unique():
         totals_data = o24v.monthly_totals(cat)
         for col in totals_data.columns:
-            fig.add_trace(
-                go.Bar(x=totals_data.index, y=totals_data[col], name=col)
-            )
+            fig.add_trace(go.Bar(x=totals_data.index, y=totals_data[col], name=col))
             location_idx.append(cat)
 
     tick_range = pd.date_range(o24v.data.index.min(), o24v.data.index.max(), freq='MS')
     tick_vals = [d.strftime('%Y-%m') for d in tick_range]
 
-    fig.update_layout(updatemenus=[
-        go.layout.Updatemenu(
-            active=1,
-            showactive=True,
-            buttons=list([dict(label=cat,
-                               method='update',
-                               args=[{'visible': [cat == loc for loc in location_idx]},
-                                     {'title': f'Monthly spend for category: {cat}',
-                                      'showlegend': True}]) for cat in set(location_idx)]
-                         )
-        )
-    ],
+    fig.update_layout(
+        updatemenus=[
+            go.layout.Updatemenu(
+                active=1,
+                showactive=True,
+                buttons=list(
+                    [dict(label=cat,
+                          method='update',
+                          args=[{'visible': [cat == loc for loc in location_idx]},
+                                {'title': f'Monthly spend for category: {cat}',
+                                 'showlegend': True}]) for cat in set(location_idx)]
+                )
+            )
+        ],
         xaxis=dict(tickmode='array', tickvals=tick_vals, ticktext=tick_vals)
     )
     fig.show()
