@@ -1,32 +1,30 @@
-bills_apt:
-- SKY
-- BORD GAIS
-bills_other:
-- SPOTIFY
-- PLEX
-- EIR
-- TESCO MOBILE
-- NETFLIX.COM
-- Amazon Prime
-cash:
-- ATM
-groceries:
-- DUNNES
-- SUPERVALU
-- TESCO STORES
-- CENTRA
-- LONDIS
-- ALDI
-- LIDL
-- SPAR
-- MARKS
-restaurants:
-- BOOJUM
-- MCDONALDS
-travel:
-- LEAP
-- GOBUS
-- IRISH RAIL
-vacation:
-- RYANAIR
-- AERLING
+# Expect:
+# dict(category1=dict(match_pattern1=tag1, match_pattern2=tag2, ...), category2=dict(...), ...)
+Bills (apartment):
+  BORD GAIS: Bord Gais
+  SKY: Sky
+Bills (other):
+  Amazon Prime: Amazon Prime
+  NETFLIX.COM: Netflix
+  NORDVPN: NordVPN
+  PLEX: Plex
+  SPOTIFY: Spotify
+  TESCO MOBILE: Tesco Mobile
+Cash:
+  ATM: ATM
+Groceries:
+  ALDI: Aldi
+  CENTRA: Centra
+  DUNNES: Dunnes Stores
+Restaurants:
+  BOOJUM: Boojum
+  NANDOS: Nandos
+Travel:
+  DualwayCoach: Aircoach
+  POS VESTA  *EIR: Bus Eireann
+  POS BUS EIREANN: Bus Eireann
+Vacation:
+  AERLING: Aerlingus
+  AIRBNB: Airbnb
+  KLM: KLM
+  RYANAIR: Ryanair
