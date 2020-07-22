@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import yaml
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
 _DATE_FORMAT = '%d %b %y'
@@ -28,7 +27,6 @@ class Open24Visual:
         desc_col = self._get_column_name(data, 'description')
         data[desc_col] = data[desc_col].astype('string')
         data.set_index(date_col, inplace=True)
-        data.sort_index(inplace=True)
         return data
 
     @staticmethod
@@ -69,12 +67,12 @@ class Open24Visual:
             raise ValueError('No data available')
         data_no_zero = self.data[self.data[self.balance] != 0.0]
         balance_data = data_no_zero[self.balance]
+        fig = go.Figure()
         for p in _ROLLING_WINDOWS:
             r = balance_data.rolling(p).mean()
-            plt.plot(r, label=f'{p} rolling average')
-        plt.plot(balance_data, label=balance_data.name)
-        plt.legend()
-        plt.show()
+            fig.add_trace(go.Scatter(x=r.index, y=r, name=f'{p} rolling average'))
+        fig.add_trace(go.Scatter(x=balance_data.index, y=balance_data, name=balance_data.name))
+        fig.show()
 
     def monthly_totals(self, category: str = None):
         # Monthly totals for all categories or a given category
@@ -108,20 +106,18 @@ def show_monthly_graphs(o24v: Open24Visual):
     tick_range = pd.date_range(o24v.data.index.min(), o24v.data.index.max(), freq='MS')
     tick_vals = [d.strftime('%Y-%m') for d in tick_range]
 
-    fig.update_layout(
-        updatemenus=[
-            go.layout.Updatemenu(
-                active=1,
-                showactive=True,
-                buttons=list(
-                    [dict(label=cat,
-                          method='update',
-                          args=[{'visible': [cat == loc for loc in location_idx]},
-                                {'title': f'Monthly spend for category: {cat}',
-                                 'showlegend': True}]) for cat in set(location_idx)]
-                )
-            )
-        ],
+    fig.update_layout(updatemenus=[
+        go.layout.Updatemenu(
+            active=1,
+            showactive=True,
+            buttons=list([dict(label=cat,
+                               method='update',
+                               args=[{'visible': [cat == loc for loc in location_idx]},
+                                     {'title': f'Monthly spend for category: {cat}',
+                                      'showlegend': True}]) for cat in set(location_idx)]
+                         )
+        )
+    ],
         xaxis=dict(tickmode='array', tickvals=tick_vals, ticktext=tick_vals)
     )
     fig.show()
