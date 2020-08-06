@@ -1,9 +1,12 @@
 import pandas as pd
 import numpy as np
+from typing import Union, List
+import os
+import datetime as dt
 import yaml
 import plotly.graph_objects as go
 
-_DATE_FORMAT = '%d %b %y'
+_XLS_DATE_FORMAT = '%d %b %y'
 _MONTH_FORMAT = '%Y-%m'
 _CATEGORY = 'Category'
 _IDENTIFIER = 'Tag'
@@ -20,10 +23,23 @@ class Open24Visual:
                 setattr(self, attr, self._get_column_name(self.data, attr))
 
     def load(self, path: str) -> pd.DataFrame:
-        # Load the Open24 xls
-        data = pd.read_csv(path, encoding='utf-16', sep='\t', thousands=',')
-        date_col = self._get_column_name(data, 'date')
-        data[date_col] = pd.to_datetime(data[date_col], format=_DATE_FORMAT)
+        """
+        Load an Open24 xls file or a csv file looks like an Open24 xls file
+        """
+        if os.path.isfile(path):
+            _, ext = os.path.splitext(path)
+            if ext == '.xls':
+                data = pd.read_csv(path, encoding='utf-16', sep='\t', thousands=',')
+                date_col = self._get_column_name(data, 'date')
+                data[date_col] = pd.to_datetime(data[date_col], format=_XLS_DATE_FORMAT)
+            elif ext == '.csv':
+                data = pd.read_csv(path)
+                date_col = self._get_column_name(data, 'date')
+                data[date_col] = pd.to_datetime(data[date_col])
+            else:
+                raise TypeError('Bad filetype')
+        else:
+            raise ValueError('Bad path')
         desc_col = self._get_column_name(data, 'description')
         data[desc_col] = data[desc_col].astype('string')
         data.set_index(date_col, inplace=True)
@@ -74,7 +90,7 @@ class Open24Visual:
         fig.add_trace(go.Scatter(x=balance_data.index, y=balance_data, name=balance_data.name))
         fig.show()
 
-    def monthly_totals(self, category: str = None):
+    def monthly_totals(self, category: str = None) -> pd.DataFrame:
         # Monthly totals for all categories or a given category
         if self.data is None:
             raise ValueError('No data available')
@@ -84,7 +100,7 @@ class Open24Visual:
         _data = self.data.copy()
         _data[_MONTH] = _data.index.strftime(_MONTH_FORMAT)
 
-        if category is None or category.lower() is 'all':
+        if category is None or category.lower() == 'all':
             return pd.pivot_table(_data, values=self.out, index=_MONTH, columns=_IDENTIFIER, aggfunc=np.sum)
         else:
             if category not in self.data[_CATEGORY].unique():
@@ -100,7 +116,9 @@ def show_monthly_graphs(o24v: Open24Visual):
     for cat in o24v.data[_CATEGORY].unique():
         totals_data = o24v.monthly_totals(cat)
         for col in totals_data.columns:
-            fig.add_trace(go.Bar(x=totals_data.index, y=totals_data[col], name=col))
+            fig.add_trace(
+                go.Bar(x=totals_data.index, y=totals_data[col], name=col)
+            )
             location_idx.append(cat)
 
     tick_range = pd.date_range(o24v.data.index.min(), o24v.data.index.max(), freq='MS')
